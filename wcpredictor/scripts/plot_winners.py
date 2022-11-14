@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 import argparse
-
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -21,12 +20,13 @@ def main():
     ax.bar(xvals, yvals)
     for label in ax.get_xticklabels():
         label.set_rotation(45)
-        label.set_ha("right")
+        label.set_ha('right')
     ax.set_ylabel("Number of wins")
     if args.output_png:
         plt.savefig(args.output_png)
     else:
         plt.show()
+
 
 
 if __name__ == "__main__":
