@@ -6,15 +6,19 @@ library(gtExtras)
 library(ggflags)
 
 df <- read.csv("merged_1668598471_ep_2_wc_4_100000.csv")
-get_progression_probabiltiies <- function(df, n_sim) {
+get_progression_probabiltiies <- function(df, n_sim, metric = "reached") {
   df <- df[order(df$W, decreasing = TRUE),]
   prog_df <- data.frame(matrix(nrow=0, ncol = 5))
   for (i in 1:nrow(df)) {
-    progression <- c(sum(df[i, c("R16", "QF", "SF", "RU", "W")]) / n_sim,
-                     sum(df[i, c("QF", "SF", "RU", "W")]) / n_sim,
-                     sum(df[i, c("SF", "RU", "W")]) / n_sim,
-                     sum(df[i, c("RU", "W")]) / n_sim,
-                     sum(df[i, c("W")]) / n_sim)
+    if (metric == "reached") {
+      progression <- c(sum(df[i, c("R16", "QF", "SF", "RU", "W")]) / n_sim,
+                       sum(df[i, c("QF", "SF", "RU", "W")]) / n_sim,
+                       sum(df[i, c("SF", "RU", "W")]) / n_sim,
+                       sum(df[i, c("RU", "W")]) / n_sim,
+                       sum(df[i, c("W")]) / n_sim)
+    } else if (metric == "knocked_out_at") {
+      progression <- df[i,c("G", "R16", "QF", "SF", "RU", "W")] / n_sim
+    }
     prog_df <- rbind(prog_df, progression)
   }
   prog_df <- cbind(df$team, prog_df)
@@ -22,6 +26,7 @@ get_progression_probabiltiies <- function(df, n_sim) {
   return(prog_df)
 }
 prog_df <- get_progression_probabiltiies(df, 100000)
+knocked_out_df <- get_progression_probabiltiies(df, 100000, "knocked_out_at")
 
 # top <- prog_df[1:16,] %>%
 #   mutate('logo' = paste0('flags/', team, '.png')) %>%
@@ -161,5 +166,5 @@ full_table <- prog_df %>%
     source_note = md("The Alan Turing Institute (Nick Barlow, Jack Roberts, Ryan Chan)<br>Based on 100,000 simulations<br>Data: GitHub (martj42/international_results)<br>Country Images: Flaticon.com and GitHub (lbenz730/world_cup_2022)")
   )
 full_table
-gtsave(full_table, filename = 'predictions.png')
+# gtsave(full_table, filename = 'predictions.png')
  
